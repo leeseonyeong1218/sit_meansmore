@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>CH3</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000000;
+        font-family: sans-serif;
+      }
+      /* ─── 배너 (배경 검정, 이미지 흰색) ─── */
+      .banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 60px;
+        height: 52px;
+        background: #000;
+        position: relative;
+        z-index: 10;
+        border-bottom: 10px solid #000;
+      }
+      .banner img {
+        height: 100%;
+        width: auto;
+        filter: brightness(0) invert(1);
+      }
+      .logo-collection,
+      .logo-left {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 25px;
+        margin-left: 40px;
+      }
+      .logo-site,
+      .logo-center {
+        transform: scale(1.4);
+        height: 15px;
+        margin-top: 25px;
+        margin-left: 175px;
+      }
+      .nav-right {
+        display: flex;
+        gap: 75px;
+      }
+      .nav-item {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 45px;
+      }
+      .nav-item.ch3 {
+        transform: scale(0.31);
+        height: 38px;
+        margin-top: 33px;
+      }
+
+      /* 화면 전체 스크린 */
+      .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 2.5s ease;
+      }
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* screen1 에 캐러셀 */
+      #screen1 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(0, 0, 0, 1) 80%
+        );
+        z-index: 2;
+      }
+      #screen1 .banner {
+        position: relative;
+      }
+      /* 캐러셀 영역 (헤더 제외한 전 높이) */
+      .carousel {
+        position: absolute;
+        top: 52px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 52px);
+        pointer-events: auto;
+        overflow: visible;
+      }
+
+      /* 3D 캐러셀 스타일 */
+      :root {
+        --items: 20;
+      }
+      .carousel-item {
+        --width: clamp(150px, 30vw, 300px);
+        --height: clamp(200px, 40vw, 400px);
+        --x: calc(var(--active) * 1300%);
+        --y: calc(var(--active) * 200%);
+        --rot: calc(var(--active) * 120deg);
+
+        position: absolute;
+        z-index: var(--zIndex);
+        width: var(--width);
+        height: var(--height);
+        top: 50%;
+        left: 50%;
+        margin: calc(var(--height) * -0.5) 0 0 calc(var(--width) * -0.5);
+        border-radius: 0;
+        overflow: hidden;
+        transform-origin: 0% 100%;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+        background: #000;
+        transform: translate3d(var(--x), var(--y), 0) rotate(var(--rot));
+
+        transition: transform 0.8s cubic-bezier(0, 0.02, 0, 1), filter 0.8s ease;
+
+        filter: blur(4px) brightness(0.7);
+      }
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        loading: lazy;
+        decoding: async;
+      }
+      #screen2 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(107, 107, 107, 1) 0%,
+          rgb(0, 0, 0) 100%
+        );
+        padding: 60px 40px;
+        box-sizing: border-box;
+        color: white;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .detail-container {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 60px;
+        padding-top: 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .detail-img {
+        flex: 0 0 clamp(200px, 30vw, 360px);
+        border-radius: 0;
+        overflow: hidden;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .detail-img img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .detail-text {
+        max-width: 400px;
+      }
+
+      .detail-text h1 {
+        font-family: "Bodoni Moda", serif;
+        font-size: 3rem;
+        margin: 0;
+        line-height: 1.1;
+        margin-top: 10px;
+        word-break: break-word;
+        hyphens: auto;
+      }
+
+      .detail-text .meta {
+        margin: 12px 0;
+        font-size: 1.25rem;
+        font-style: italic;
+        margin-top: 10px;
+      }
+
+      .detail-text p {
+        color: rgb(192, 192, 192);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-top: 80px;
+      }
+
+      .btn-back {
+        position: absolute;
+        top: 40px;
+        left: 40px;
+        color: #7a7a7a;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      #screen0 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(107, 107, 107, 1) 0%,
+          rgb(0, 0, 0) 100%
+        );
+        color: white;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ch1-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 40px;
+        text-align: left;
+      }
+
+      .text-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .text-wrap h1 {
+        font-family: "Bodoni Moda", serif;
+        font-size: clamp(2rem, 5vw, 4rem);
+        margin-bottom: 30px;
+        margin-top: 20px;
+        margin-left: 40px;
+      }
+
+      .text-wrap p {
+        color: rgb(190, 190, 190);
+        max-width: 600px;
+        font-family: "Source Code Pro", monospace;
+        font-size: 13pt;
+        line-height: 2;
+        white-space: pre-wrap;
+        margin: 0;
+        max-width: 100%;
+        height: 240px;
+        overflow-y: auto;
+        max-width: 600px;
+        text-align: left;
+        margin-left: 100px;
+      }
+      @import url("https://fonts.googleapis.com/css?family=Mukta:700");
+
+      body {
+        font-family: "Mukta", sans-serif;
+        background: #f3f8fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      #learn-more-container {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 999;
+      }
+
+      button.learn-more {
+        position: relative;
+        display: inline-block;
+        width: 12rem;
+        height: auto;
+        cursor: pointer;
+        outline: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        font-size: inherit;
+        font-family: inherit;
+      }
+
+      button.learn-more .circle {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: relative;
+        display: block;
+        margin: 0;
+        width: 3rem;
+        height: 3rem;
+        background: #000000;
+        border-radius: 1.625rem;
+      }
+
+      button.learn-more .circle .icon {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: #fff;
+      }
+
+      button.learn-more .circle .icon.arrow {
+        left: 0.625rem;
+        width: 1.125rem;
+        height: 0.125rem;
+        background: none;
+      }
+
+      button.learn-more .circle .icon.arrow::before {
+        content: "";
+        position: absolute;
+        top: -0.25rem;
+        right: 0.0625rem;
+        width: 0.625rem;
+        height: 0.625rem;
+        border-top: 0.125rem solid #fff;
+        border-right: 0.125rem solid #fff;
+        transform: rotate(45deg);
+      }
+
+      button.learn-more .button-text {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 1.1rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: rem 0;
+        margin: 0 0 0 1.85rem;
+        color: #ffffff;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      button.learn-more:hover .circle {
+        width: 100%;
+      }
+
+      button.learn-more:hover .circle .icon.arrow {
+        transform: translate(1rem, 0);
+        background: #fff;
+      }
+
+      button.learn-more:hover .button-text {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="learn-more-container" class="hidden">
+      <button class="learn-more" id="go-to-collection">
+        <span class="circle" aria-hidden="true">
+          <span class="icon arrow"></span>
+        </span>
+        <span class="button-text">COLLECTION</span>
+      </button>
+    </div>
+
+    <div id="screen0" class="screen">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <div class="ch1-content">
+        <div class="text-wrap">
+          <h1>Chairs as Identity</h1>
+          <p id="typed-text"></p>
+        </div>
+      </div>
+    </div>
+    <div id="screen1" class="screen">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <div class="carousel">
+        <!-- 20 items -->
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/3OEFRzk.jpeg" alt="1" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/o4CWgVc.jpeg" alt="2" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/vXa38Ma.jpeg" alt="3" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/rdz3ruh.jpeg" alt="4" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/5fSH08r.jpeg" alt="5" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/W9UuPcx.jpeg" alt="6" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/S58Qj87.jpeg" alt="7" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/oJCepKs.jpeg" alt="8" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/hDUrCzs.jpeg" alt="9" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/EuSCOls.jpeg" alt="10" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/crAY3Wy.jpeg" alt="11" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/yg38V12.jpeg" alt="12" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/r5zUmAJ.jpeg" alt="13" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/pPAnPwV.jpeg" alt="14" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/NACPNim.jpeg" alt="15" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/ckVJtNc.jpeg" alt="16" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/2uiNFEI.jpeg" alt="17" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/oL5OKmS.jpeg" alt="18" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/VKlHvxl.jpeg" alt="19" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/gdjHP5L.jpeg" alt="20" />
+        </div>
+      </div>
+    </div>
+
+    <div id="screen2" class="screen hidden">
+      <div class="btn-back" onclick="showScreen(1)">&larr; BACK</div>
+      <div class="detail-container">
+        <div class="detail-img">
+          <img id="detail-image" src="" alt="Detail" />
+        </div>
+        <div class="detail-text">
+          <h1 id="detail-title"></h1>
+          <div class="meta">
+            <span id="detail-year"></span> &nbsp;|&nbsp;
+            <span id="detail-company"></span>
+          </div>
+          <p id="detail-desc"></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      const $items = document.querySelectorAll(".carousel-item");
+      document.documentElement.style.setProperty("--items", $items.length);
+      let progress = 0,
+        startX = 0,
+        active = 0,
+        isDown = false;
+      const speedWheel = 0.02,
+        speedDrag = -0.1;
+      // ① 클릭된 인덱스의 메타데이터
+      const data = [
+        {
+          title: "First Chair",
+          year: "1983",
+          company:
+            "Jørgen Hovelskov · Christensen & Larsen Mobelværk → Koch Design",
+          desc: "First Chair는 튜블러 스틸 프레임 위에 래커 칠한 자작나무 합판 시트를 장착해 사람 상반신 윤곽을 형상화한 조각적 가구다. 가벼운 무게와 휴대 가능한 구조 덕분에 전시장 어디로든 쉽게 이동할 수 있으며, 사용자가 직접 앉음으로써 작품의 의미가 완성된다. 매끄러운 래커 표면과 차가운 메탈의 대비가 내면의 긴장과 반항적 에너지를 동시에 환기한다. 원래 Memphis Milano에서 한정 생산된 후 Artemide의 라이선스로 재생산되며 시대를 초월한 디자인 아이콘으로 인정받는다. 전시에서는 모던 권위를 해체하는 매니페스토로서 일상 가구가 개인의 정체성 퍼포먼스로 전환되는 과정을 드러낸다.",
+        },
+        {
+          title: "Sketch Chair",
+          year: "2005",
+          company: "Frank Gehry · Jack Brogan → Chiru → Vitra",
+          desc: "Sketch Chair는 모션 캡처로 기록된 손의 궤적 데이터를 3D 프린팅한 세라믹 강화 수지 그물망으로 직조해 ‘움직임의 드로잉’을 물리적 구조로 전환한 작품이다. 그물망은 늘어났다 팽팽해졌다 하며 동적 변형을 반복해 ‘창조적 참여’의 순간을 온몸으로 체감하게 만든다. 스톡홀름과 밀라노에서 단 세 점만 한정 공개되어 기술과 신체가 협업하는 퍼포먼스 장치로 평가받는다. 사용자의 움직임이 곧 작품의 형상이 되어 흔적으로 남는 과정을 체험하는 동안, 관객은 자신만의 드로잉을 완성하는 창작자가 된다. 전시에서는 제작·사용·참여가 일체화된 장치로서 가구가 공동 창작의 무대로 기능함을 보여 준다.",
+        },
+        {
+          title: "Family Chairs",
+          year: "2010",
+          company:
+            "Gianantonio De Pas · Donato D’Urbino · Paolo Lomazzi · Zanotta",
+          desc: "Family Chairs는 Ø4mm 강철 메쉬로 짜인 다섯 개의 의자가 각기 다른 등받이 높이와 각도로 배치되어 가족적 연대와 개별성 사이의 미묘한 균형을 시각화한다. 사용자가 앉을 때마다 메쉬가 미세하게 변형되어 체온과 압력을 기록하므로 살아 있는 존재의 참여를 증명하듯 작품에 지속적으로 흔적을 남긴다. 2010년 밀라노 가구 박람회에서 첫 공개된 이후 Living Divani가 제작을 이어왔으며, CNC 가공 기술로 구현한 가벼운 구조미와 사회적 서사가 결합된 대표작으로 인정받는다. 전시 공간에서는 이 의자들이 조각된 군집처럼 관객을 둘러싸며 개별이 집단 안에서 어떻게 형태를 유지하고 변화하는지 성찰하도록 유도한다.",
+        },
+        {
+          title: "T1 Chair",
+          year: "2016",
+          company: "Joe Colombo · Flexform → Cappellini",
+          desc: "T1 Chair는 단풍나무 또는 물푸레나무로 제작한 좌판과 다리에 투명 우레탄 코팅을 입히고, 컬러 파우더 코팅된 S자형 스프링강을 등받이 지지대로 활용해 간결하지만 장난기 어린 움직임을 구현한 디자인이다. 스프링강은 사용자의 체중 변화에 따라 최대 15°까지 부드럽게 흔들려 스스로의 리듬을 감각적으로 체험하게 만든다. Maruni Wood Industry의 3D 목재 가공 기술로 완성된 이 의자는 따뜻한 나무와 차가운 강철의 대비를 통해 일상의 긴장과 완화를 동시에 경험하도록 한다. 작은 구조적 변화가 개인의 감각 경험을 증폭하는 과정을 생생하게 보여 주며, 미세 조정이 만드는 큰 차이를 체험하도록 초대한다.",
+        },
+        {
+          title: "Bambi Chair",
+          year: "2015",
+          company: "Takeshi Sawada · Elements Optimal",
+          desc: "Bambi Chair는 발굽을 연상시키는 나무 다리 위에 얼룩진 인조 모피 시트를 얹고 사슴 뿔을 은유한 곡선 등받이를 결합해 동심과 상상력을 자극하는 페르소나 장치를 완성한다. 직접적 형상을 배제한 은유적 단서를 통해 관객은 스스로 어린 시절 기억을 투영하며 자신만의 동화 공간을 떠올리게 만든다. Elements Optimal이 소량 생산한 이 의자는 서사적 몰입 경험을 제공하며, 작은 크기에도 불구하고 강력한 감각적 힘을 발휘한다. 전시에서는 관객이 앉아 동화 속 주인공이 되는 경험을 통해 공간과 기억의 경계를 탐색하도록 초대한다.",
+        },
+        {
+          title: "Scissor Chair",
+          year: "1968",
+          company: "Maarten van Severen · Vitra",
+          desc: "Scissor Chair는 Ø12mm 크롬 도금 강철 튜브와 패브릭 또는 가죽 시트를 교차한 스캐폴드 구조로 Brighton Beach 폴딩 체어를 현대적으로 재해석한 작품이다. 접이식 힌지 메커니즘을 통해 즉시 펼치거나 접을 수 있어 휴대성과 유연성을 극대화하며, 인체공학적 각도로 허리를 자연스럽게 지지한다. 1968년 Brickel Associates가 원형을 제작하고 2004년 Geiger가 재출시한 이후 꾸준히 사랑받아 왔으며, 기능과 스타일이 공존하는 개인화된 퍼포먼스를 제안한다. 전시에서는 관객이 직접 조립·해체하며 사용자의 손길이 곧 작품을 완성한다는 사실을 체험하게 한다.",
+        },
+        {
+          title: "Light Light Chair",
+          year: "1987",
+          company: "Peter Karpf · iForm",
+          desc: "Light Light Chair는 Nomex® 허니콤 코어와 에폭시 코팅된 탄소 섬유 매트를 압착해 무게를 900g 이하로 줄인 초경량 구조로, Alias가 50점만 한정 생산했다. 중력에 대한 선입견을 깨뜨리는 이 의자는 앉았을 때 자신의 무게와 움직임을 극대화된 감각으로 인식하게 하며, 마치 공중에 떠 있는 듯한 착시를 유도한다. 지오 폰티의 699 슈퍼레제라 의자에 대한 오마주로서 기술과 미니멀리즘의 만남을 시각화한 작품으로 평가받으며 ‘가벼움의 명상’을 체험하게 한다.",
+        },
+        {
+          title: "Crate Chair",
+          year: "1935",
+          company: "Alberto Rosselli · Saporiti",
+          desc: "Crate Chair는 화물 상자용 소나무 판재를 단순 절단해 나사만으로 조립하도록 설계된 DIY 구조를 채택해 대공황 시절 절약 정신과 민주적 디자인 철학을 상징한다. 거친 목재 질감은 정직함을 환기시키며, 분리 가능한 쿠션은 관객이 편안함을 자유롭게 커스터마이징하도록 초대한다. Rietveld Originals와 Cassina 복각을 통해 오늘날까지 생산되며 가구 제작과 소비의 경계를 허무는 참여형 아트 피스로 기능한다. 전시에서는 단순함이 창의성의 토대가 되는 과정을 담담히 보여 준다.",
+        },
+        {
+          title: "Spring Chair",
+          year: "c. 2000",
+          company: "Samuel Gragg · Shop of Samuel Gragg",
+          desc: "Spring Chair는 유려한 곡선으로 흐르는 스테인리스 스틸 프레임이 폴리우레탄 폼 패딩을 감싸고, 조절 가능한 헤드레스트와 반응형 발판이 신체의 각도와 리듬에 즉시 반응하도록 설계된 라운지 체어다. Cappellini의 다채로운 색상 옵션은 사용자의 감정과 공간 분위기를 즉각 반영해 개인만의 오아시스를 창조한다. 이 의자는 물체와 신체 간의 대화를 시각적·촉각적으로 구현하며, 관객이 앉음으로써 자아의 유동성을 실험하도록 한다. 전시에서는 인간과 사물의 상호작용이 개인 정체성을 어떻게 확장하는지 보여 준다.",
+        },
+        {
+          title: "Corallo Chair",
+          year: "2006",
+          company: "Fernando Campana & Humberto Campana · Edra",
+          desc: "Corallo Chair는 Ø2mm 강철 와이어를 손으로 엮어 산호를 연상시키는 유기적 그물망을 형성하고, 폐기된 산업 소재에 새로운 생명력을 불어넣는 업사이클링 아트의 정수다. 빛과 그림자가 어우러진 불규칙한 패턴은 회복과 재창조의 서사를 전하며, 관객은 수작업의 흔적을 통해 제작자의 호흡을 느낀다. Edra에서 한 점당 30시간 이상 투입해 완성한 이 작품은 ‘소비 이후의 가능성’을 성찰하는 조형 장치로 작동한다. 전시 맥락에서는 개인의 자원 재발견을 은유하며 창조적 변형을 체험하게 한다.",
+        },
+        {
+          title: "Zig-Zag Chair",
+          year: "1934",
+          company: "Erwan Bouroullec & Ronan Bouroullec · Vitra",
+          desc: "Zig-Zag Chair는 네 장의 자작나무 합판을 사선으로 연결해 하나의 연속된 ‘Z’ 형태를 이루고 도브테일 조인트와 삼각 쐐기로 구조적 완결성을 확보한 미니멀 기하학의 극치다. 평면의 균질함이 발산하는 단단함과 선명한 각이 단호한 자아를 은유하며, 목재의 자연스러운 온기는 인간미를 더한다. Metz & Co와 Cassina 복각을 통해 수십 년간 이어져 온 이 작품은 불필요를 제거함으로써 본질에 다가서는 미니멀리즘 실험으로 자리매김한다. 전시에서는 관객이 앉아 극단적 단순함의 의미를 사유하도록 유도한다.",
+        },
+        {
+          title: "Tulip Chair",
+          year: "1960",
+          company: "Eero Saarinen · Knoll International",
+          desc: "Tulip Chair는 광택 래커 마감된 성형 유리섬유 쉘이 꽃잎을 닮은 곡선을 그리며 슬림 알루미늄 중앙 받침 위에 떠 있는 듯한 안락함을 제공한다. Saarinen International이 1960년에 출시하여 이후 Knoll International에서 생산되었으며, 조각과 가구의 경계를 허문 혁신적 디자인으로 평가받는다. 사용자는 곡면 안으로 스며들듯 앉아 형태미와 기능이 결합된 편안함을 경험하며, 시각적 간결함 속에서 자신의 내면적 정원을 발견한다. 전시에서는 조각적 가구가 자아를 꽃피우는 매개임을 강조한다.",
+        },
+        {
+          title: "Egg Chair",
+          year: "1958",
+          company: "Arne Jacobsen · Fritz Hansen",
+          desc: "Egg Chair는 몰딩된 플라스틱 껍데기에 폴리우레탄 폼과 가죽 또는 울 패브릭을 입혀 외부 환경과 분리된 개인용 은신처를 제공한다. Copenhagen SAS Royal 호텔을 위해 1958년에 디자인된 후 Fritz Hansen이 생산을 이어왔으며, 회전 가능한 스윙 베이스는 사용자의 방향 전환을 돕는다. 매끄러운 곡선 쉘은 시각적 안정감을 주며 사적인 나의 심리적 경계를 탐색하게 한다. 전시에서는 이러한 공간적 분리를 통해 개인적 성찰의 순간을 마련한다.",
+        },
+        {
+          title: "Zaisu Chair",
+          year: "1966",
+          company: "Kenji Fujimoto · Tendo Mokko",
+          desc: "Zaisu Chair는 일본 전통 다다미 좌식 문화를 현대적 등받이 의자로 재해석하여 낮은 무게중심과 폴리프로필렌 슬링 시트를 결합한 하이브리드 디자인이다. Tendo Mokko가 1966년에 출시한 이후 쉽게 쌓아 보관할 수 있는 컴팩트한 형태로 현대적 공간 활용에 최적화되었으며, 일본과 핀란드 미학이 교차하는 독특함을 지닌다. 관객은 이 의자에 앉아 땅과 몸이 직접 닿는 친밀감을 경험하며, 뿌리 깊은 정체성을 직관적으로 체험하게 된다. 전시에서는 전통과 현대, 동서양이 공존하는 자아를 사유하도록 초대한다.",
+        },
+        {
+          title: "Bowl Chair",
+          year: "1951",
+          company: "Lina Bo Bardi · Arper",
+          desc: "Bowl Chair는 스틸 튜브 프레임에 매달린 반원형 금형 쿠션을 통해 단순 기하학 속에서 포근함과 시각적 긴장을 동시에 제공한다. Casa de Vidro에서 1951년에 처음 선보인 이후 Arper에서 생산된 이 작품은 브라질 모더니즘의 인간 중심적 열정과 사회적 참여 정신을 담고 있다. 넉넉한 곡선 쉘은 사용자를 감싸 안으며, 전시에서는 장소와 개인이 상호작용하는 양상을 예술적으로 제시한다.",
+        },
+        {
+          title: "Flax Chair",
+          year: "2016",
+          company: "Christien Meindertsma · Label Breed / Enkev",
+          desc: "Flax Chair는 직조 아마 섬유와 PLA 섬유를 허니컴 구조로 결합해 생애 말 자연 분해되는 지속 가능성을 완성한 작품이다. Label Breed와 Enkev의 협업으로 탄생하여 2016년 네덜란드 디자인상과 미래상을 수상했으며, 따스한 황갈색 질감은 환경과 자아의 경계를 흐릿하게 만든다. 최소 폐기물 철학을 체험적 메시지로 전달하며, 전시에서는 윤리적 자아와 디자인이 만나는 지점을 사유하도록 유도한다.",
+        },
+        {
+          title: "Anaconda Chair",
+          year: "1972",
+          company: "Konstantin Grcic · Magis",
+          desc: "Anaconda Chair는 광택 크롬 튜브가 뱀처럼 유연하게 휘어져 유리섬유 판넬과 가죽 커버를 감싸며 움직임의 흐름을 고정된 형태로 포착한 디자인이다. Strässle에서 6점만 한정 생산된 이 아이콘은 1973년 제임스 본드 영화에 등장해 모험적 럭셔리의 상징으로 자리매김했다. 곡선과 재질 대비는 제약과 해방 사이의 긴장을 시각화하며 관객으로 하여금 대담한 자아를 직면하도록 초대한다. 전시 맥락에서 Anaconda Chair는 굴곡진 자아 여정을 은유하는 조형 장치로 기능한다.",
+        },
+        {
+          title: "UN Lounge Chair",
+          year: "2013",
+          company: "André Dubreuil · Ceccomi Collezioni",
+          desc: "UN Lounge Chair는 Kvadrat Blend의 파란 직조 패브릭 시트와 분체 도장 강철 프레임, 호두나무 팔걸이가 조화를 이루며 유엔 본부의 공공성과 인간미를 동시에 구현한다. 앞다리 바퀴와 뒤편 손잡이는 다양한 회의실과 라운지 공간에서 즉시 배치 변경을 가능케 해 ‘협업 속 개인의 유연성’을 상징한다. Vitra가 제작·배포하며 공공과 사적 공간을 잇는 매개체로 자리잡은 이 의자는 전시에서 글로벌 협업과 개인의 역할을 사유하는 장치로 기능한다.",
+        },
+        {
+          title: "Do Hit Chair",
+          year: "2000",
+          company: "Achille Castiglioni · Zanotta",
+          desc: "Do Hit Chair는 스테인리스 스틸 큐브와 2.5kg 망치가 세트로 제공되어 관객이 직접 망치로 큐브를 타격하며 의자의 형태를 완성하는 인터랙티브 퍼포먼스를 선보인다. Droog Design이 밀라노 살로네에서 처음 공개한 이후 파괴와 창조가 공존하는 행위를 통해 ‘본능적 참여’를 조형화했다. 각 타격이 남긴 잔흔은 작품이자 기록으로 남아 관객은 자신의 흔적을 작품 속에 각인한다. 전시에서는 행위가 곧 결과임을 경험하게 함으로써 정체성 형성의 과정을 은유적으로 드러낸다.",
+        },
+        {
+          title: "Stitch Chair",
+          year: "2008",
+          company: "Joris Laarman · limited edition",
+          desc: "Stitch Chair는 레이저 절단 알루미늄 프레임 위에 폴리에스터·엘라스테인 편물 슬링을 촘촘히 직조해 시각적 가벼움과 변칙적 저항을 동시에 제공하는 디자인이다. 그물망이 늘어났다 팽팽해졌다 하는 동적 변화는 ‘느림의 미학’을 체감하게 하며, 산업 시스템 속 잊혀진 인간의 속도를 재조명한다. 다섯 가지 색상 조합은 다양한 전시 환경에 즉시 적응 가능하며, 느림의 리추얼을 재발견하게 하는 조형 장치로 ‘시간과 몸의 관계’를 깊이 사유하도록 초대한다.",
+        },
+      ];
+      // ③ 화면 전환 함수
+      function showScreen(n) {
+        document.getElementById("screen1").classList.toggle("hidden", n !== 1);
+        document.getElementById("screen2").classList.toggle("hidden", n !== 2);
+      }
+
+      // ④ 상세보기 함수
+      function showDetail(idx) {
+        const info = data[idx];
+        const imgSrc = $items[idx].querySelector("img").src;
+        document.getElementById("detail-image").src = imgSrc;
+        document.getElementById("detail-title").textContent = info.title;
+        document.getElementById("detail-year").textContent = info.year;
+        document.getElementById("detail-company").textContent = info.company;
+        document.getElementById("detail-desc").textContent = info.desc;
+        showScreen(2); // 화면 전환
+      }
+
+      function getZ(arr, i) {
+        return arr.map((_, j) =>
+          j === i ? arr.length : arr.length - Math.abs(i - j)
+        );
+      }
+
+      function display(it, i, act) {
+        const z = getZ([...$items], act)[i];
+        it.style.setProperty("--zIndex", z);
+        it.style.setProperty("--active", (i - act) / $items.length);
+        // 필터 적용: 중앙만 선명하게, 나머지는 뿌옇게
+        it.style.filter = i === act ? "none" : "blur(4px) brightness(0.7)";
+      }
+
+      function animate() {
+        progress = Math.max(0, Math.min(progress, 100));
+        active = Math.floor((progress / 100) * ($items.length - 1));
+        $items.forEach((it, i) => display(it, i, active));
+
+        // ★ Learn More 버튼 표시 로직 추가
+        const learnMoreBtn = document.getElementById("learn-more-container");
+        const screen1Visible = !document
+          .getElementById("screen1")
+          .classList.contains("hidden");
+
+        if (screen1Visible && active === 19) {
+          learnMoreBtn.classList.remove("hidden");
+        } else {
+          learnMoreBtn.classList.add("hidden");
+        }
+      }
+
+      (function loop() {
+        animate();
+        requestAnimationFrame(loop);
+      })();
+
+      $items.forEach((it, i) => {
+        it.addEventListener("click", () => {
+          if (i === active) {
+            showDetail(i);
+          } else {
+            progress = (i / $items.length) * 100 + 10;
+          }
+        });
+      });
+
+      document.addEventListener(
+        "wheel",
+        (e) => (progress += e.deltaY * speedWheel),
+        { passive: true }
+      );
+      document.addEventListener("mousedown", (e) => {
+        isDown = true;
+        startX = e.clientX;
+      });
+      document.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        progress += (e.clientX - startX) * speedDrag;
+        startX = e.clientX;
+      });
+      document.addEventListener("mouseup", (_) => (isDown = false));
+      document.addEventListener(
+        "touchstart",
+        (e) => {
+          isDown = true;
+          startX = e.touches[0].clientX;
+        },
+        { passive: true }
+      );
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!isDown) return;
+          progress += (e.touches[0].clientX - startX) * speedDrag;
+          startX = e.touches[0].clientX;
+        },
+        { passive: true }
+      );
+      document.addEventListener("touchend", (_) => (isDown = false));
+    </script>
+    <script>
+      const text =
+        '"Chairs as Identity전시의 의자들은 사용자의 개성을 드러내는 디자인  요소로 구성된다. 디자이너는 소재·색상·형태마다 특정 키워드를 부여해 ‘나’를 설명하는 시각적 단서를 심는다. 의자는 더 이상 앉기 위한 도구가 아니라,    퍼스널 브랜딩 시대의 ‘나를 보여주는 아바타’로 기능한다. 전시는 의자라는   오브제를 통해 정체성 표현의 지평을 확장하며, 관객 스스로 자신의 개성을    하나의 물리적 언어로 재구성하도록 한다.';
+      let idx = 0;
+      let typedDone = false;
+
+      function typeWriter() {
+        if (idx < text.length) {
+          document.getElementById("typed-text").textContent += text.charAt(idx);
+          idx++;
+          setTimeout(typeWriter, 50);
+        } else {
+          typedDone = true;
+          document.getElementById("typed-text").classList.add("cursor");
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        typeWriter();
+
+        document.getElementById("screen0").addEventListener("click", () => {
+          document.getElementById("screen0").classList.add("hidden");
+          document.getElementById("screen1").classList.remove("hidden");
+        });
+      });
+    </script>
+    <script>
+      document
+        .getElementById("go-to-collection")
+        .addEventListener("click", (e) => {
+          e.preventDefault(); // 혹시라도 form submit 방지
+          window.location.href = "collection.html";
+        });
+    </script>
+  </body>
+</html>
