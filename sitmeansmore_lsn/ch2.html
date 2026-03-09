@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>CH2</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000000;
+        font-family: sans-serif;
+      }
+      /* ─── 배너 (배경 검정, 이미지 흰색) ─── */
+      .banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 60px;
+        height: 52px;
+        background: #000;
+        position: relative;
+        z-index: 10;
+        border-bottom: 10px solid #000;
+      }
+      .banner img {
+        height: 100%;
+        width: auto;
+        filter: brightness(0) invert(1);
+      }
+      .logo-collection,
+      .logo-left {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 25px;
+        margin-left: 40px;
+      }
+      .logo-site,
+      .logo-center {
+        transform: scale(1.4);
+        height: 15px;
+        margin-top: 25px;
+        margin-left: 175px;
+      }
+      .nav-right {
+        display: flex;
+        gap: 75px;
+      }
+      .nav-item {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 45px;
+      }
+      .nav-item.ch3 {
+        transform: scale(0.31);
+        height: 38px;
+        margin-top: 33px;
+      }
+
+      /* 화면 전체 스크린 */
+      .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 2.5s ease;
+      }
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* screen1 에 캐러셀 */
+      #screen1 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(0, 0, 0, 1) 80%
+        );
+        z-index: 2;
+      }
+      #screen1 .banner {
+        position: relative;
+      }
+      /* 캐러셀 영역 (헤더 제외한 전 높이) */
+      .carousel {
+        position: absolute;
+        top: 52px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 52px);
+        pointer-events: auto;
+        overflow: visible;
+      }
+
+      /* 3D 캐러셀 스타일 */
+      :root {
+        --items: 20;
+      }
+      .carousel-item {
+        --width: clamp(150px, 30vw, 300px);
+        --height: clamp(200px, 40vw, 400px);
+        --x: calc(var(--active) * 1300%);
+        --y: calc(var(--active) * 200%);
+        --rot: calc(var(--active) * 120deg);
+
+        position: absolute;
+        z-index: var(--zIndex);
+        width: var(--width);
+        height: var(--height);
+        top: 50%;
+        left: 50%;
+        margin: calc(var(--height) * -0.5) 0 0 calc(var(--width) * -0.5);
+        border-radius: 10px;
+        overflow: hidden;
+        transform-origin: 0% 100%;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+        background: #000;
+        transform: translate3d(var(--x), var(--y), 0) rotate(var(--rot));
+
+        transition: transform 0.8s cubic-bezier(0, 0.02, 0, 1), filter 0.8s ease;
+
+        filter: blur(4px) brightness(0.7);
+      }
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        loading: lazy;
+        decoding: async;
+      }
+      #screen2 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(107, 107, 107, 1) 0%,
+          rgb(0, 0, 0) 100%
+        );
+        padding: 60px 40px;
+        box-sizing: border-box;
+        color: white;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .detail-container {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 60px;
+        padding-top: 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .detail-img {
+        flex: 0 0 clamp(200px, 30vw, 360px);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .detail-img img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .detail-text {
+        max-width: 400px;
+      }
+
+      .detail-text h1 {
+        font-family: "Bodoni Moda", serif;
+        font-size: 3rem;
+        margin: 0;
+        line-height: 1.1;
+        margin-top: 10px;
+        word-break: break-word;
+        hyphens: auto;
+      }
+
+      .detail-text .meta {
+        margin: 12px 0;
+        font-size: 1.25rem;
+        font-style: italic;
+        margin-top: 10px;
+      }
+
+      .detail-text p {
+        color: rgb(192, 192, 192);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-top: 80px;
+      }
+
+      .btn-back {
+        position: absolute;
+        top: 40px;
+        left: 40px;
+        color: #7a7a7a;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      #screen0 {
+        background: radial-gradient(
+          circle at 50% 160%,
+          rgba(107, 107, 107, 1) 0%,
+          rgb(0, 0, 0) 100%
+        );
+        color: white;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ch1-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 40px;
+        text-align: left;
+      }
+
+      .text-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .text-wrap h1 {
+        font-family: "Bodoni Moda", serif;
+        font-size: clamp(2rem, 5vw, 4rem);
+        margin-bottom: 30px;
+        margin-top: 20px;
+        margin-left: -40px;
+      }
+
+      .text-wrap p {
+        color: rgb(190, 190, 190);
+        max-width: 600px;
+        font-family: "Source Code Pro", monospace;
+        font-size: 13pt;
+        line-height: 2;
+        white-space: pre-wrap;
+        margin: 0;
+        max-width: 100%;
+        height: 240px;
+        overflow-y: auto;
+        max-width: 600px;
+        text-align: left;
+        margin-left: 100px;
+      }
+      @import url("https://fonts.googleapis.com/css?family=Mukta:700");
+
+      body {
+        font-family: "Mukta", sans-serif;
+        background: #f3f8fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      #learn-more-container {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 999;
+      }
+
+      button.learn-more {
+        position: relative;
+        display: inline-block;
+        width: 12rem;
+        height: auto;
+        cursor: pointer;
+        outline: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        font-size: inherit;
+        font-family: inherit;
+      }
+
+      button.learn-more .circle {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: relative;
+        display: block;
+        margin: 0;
+        width: 3rem;
+        height: 3rem;
+        background: #000000;
+        border-radius: 1.625rem;
+      }
+
+      button.learn-more .circle .icon {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: #fff;
+      }
+
+      button.learn-more .circle .icon.arrow {
+        left: 0.625rem;
+        width: 1.125rem;
+        height: 0.125rem;
+        background: none;
+      }
+
+      button.learn-more .circle .icon.arrow::before {
+        content: "";
+        position: absolute;
+        top: -0.25rem;
+        right: 0.0625rem;
+        width: 0.625rem;
+        height: 0.625rem;
+        border-top: 0.125rem solid #fff;
+        border-right: 0.125rem solid #fff;
+        transform: rotate(45deg);
+      }
+
+      button.learn-more .button-text {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 1.1rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: rem 0;
+        margin: 0 0 0 1.85rem;
+        color: #ffffff;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      button.learn-more:hover .circle {
+        width: 100%;
+      }
+
+      button.learn-more:hover .circle .icon.arrow {
+        transform: translate(1rem, 0);
+        background: #fff;
+      }
+
+      button.learn-more:hover .button-text {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="learn-more-container" class="hidden">
+      <a href="ch3.html">
+        <button class="learn-more">
+          <span class="circle" aria-hidden="true">
+            <span class="icon arrow"></span>
+          </span>
+          <span class="button-text">CHAPTER 03</span>
+        </button>
+      </a>
+    </div>
+
+    <div id="screen0" class="screen">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <div class="ch1-content">
+        <div class="text-wrap">
+          <h1>Uncomfortable<br />Chairs</h1>
+          <p id="typed-text"></p>
+        </div>
+      </div>
+    </div>
+    <div id="screen1" class="screen">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <div class="carousel">
+        <!-- 20 items -->
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/1nkuY0b.jpeg" alt="1" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/f0VGjJu.jpeg" alt="2" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/vVfM1UB.jpeg" alt="3" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/K7jv1ZI.jpeg" alt="4" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/E51O48T.jpeg" alt="5" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/er2dJeF.jpeg" alt="6" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/qFB8jmU.jpeg" alt="7" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/2wkxCfA.jpeg" alt="8" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/E8I5N5T.jpeg" alt="9" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/LJSqrmg.jpeg" alt="10" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/ueP2K3t.jpeg" alt="11" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/mE9FGRs.jpeg" alt="12" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/E0yR9wF.jpeg" alt="13" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/oBZAYun.jpeg" alt="14" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/G1wQlcD.jpeg" alt="15" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/zfeLsEF.jpeg" alt="16" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/JZlDrAu.jpeg" alt="17" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/dNudE6I.jpeg" alt="18" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/MPrb0ra.jpeg" alt="19" />
+        </div>
+        <div class="carousel-item">
+          <img src="https://i.imgur.com/b7meEQ4.jpeg" alt="20" />
+        </div>
+      </div>
+    </div>
+
+    <div id="screen2" class="screen hidden">
+      <div class="btn-back" onclick="showScreen(1)">&larr; BACK</div>
+      <div class="detail-container">
+        <div class="detail-img">
+          <img id="detail-image" src="" alt="Detail" />
+        </div>
+        <div class="detail-text">
+          <h1 id="detail-title"></h1>
+          <div class="meta">
+            <span id="detail-year"></span> &nbsp;|&nbsp;
+            <span id="detail-company"></span>
+          </div>
+          <p id="detail-desc"></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      const $items = document.querySelectorAll(".carousel-item");
+      document.documentElement.style.setProperty("--items", $items.length);
+      let progress = 0,
+        startX = 0,
+        active = 0,
+        isDown = false;
+      const speedWheel = 0.02,
+        speedDrag = -0.1;
+      // ① 클릭된 인덱스의 메타데이터
+      const data = [
+        {
+          title: "Harp Chair",
+          year: "1968",
+          company:
+            "Jørgen Hovelskov · Christensen & Larsen Mobelværk → Koch Design",
+          desc: "하프 의자는 바이킹 선박의 뱃머리에서 영감을 얻어 로프 짜임 등판을 구현했다. 깃발용 밧줄이 유연하게 지탱하며 앉을 때마다 미세 흔들림을 선사한다. 이 작품을 통해 목재 틀과 로프의 대비가 시각적 긴장을 강조하는 동시에, 모더니즘 조각과 기능적 가구의 경계를 허문다. 요르겐 호벨스코프의 초기 대표작으로, 1968년 첫 제작 후 2010년 Koch Design에 의해 복각되어 오늘날까지 사랑받고 있다. 긴장감과 유연함을 동시에 담아낸 하프 의자는, 착석자가 스스로 경험을 조율하도록 촉구하는 참여적 디자인 철학을 제시한다.",
+        },
+        {
+          title: "Wiggle Side Chair",
+          year: "1972",
+          company: "Frank Gehry · Jack Brogan → Chiru → Vitra",
+          desc: "골판지를 겹겹이 쌓아 흐르는 곡선을 만들었으나 앉으면 각 층마다 압박감이 달리 전달된다. 체중에 따라 빛이 스며들며 내면의 불안정함을 드러낸다. 편안함의 환상을 깨뜨리며 산업적 완전성에 균열을 내는 이 의자는 형태와 감각의 모순을 시각화한다. 프랭크 게리의 건축적 해석을 가구로 옮긴 실험적 작품으로, 1982년 Chiru를 거쳐 Vitra에서 재생산되며 전 세계에 영향력을 미치고 있다. 위글 사이드 체어는 ‘정해진 형태’와 ‘가변적 착석감’ 사이를 가로지르며 사용자의 신체 기억을 재구성하는 매개체가 된다.",
+        },
+        {
+          title: "Blow Chair",
+          year: "1967",
+          company:
+            "Gianantonio De Pas · Donato D’Urbino · Paolo Lomazzi · Zanotta",
+          desc: "PVC 실린더를 고주파 용접해 만든 공기 주입 의자로, 팽창과 수축이 반복되며 안정감과 불안정함의 간극을 체험하게 한다. 가정용 수리 키트를 동봉해 소비자의 직접 수리를 유도했다. 미쉐린 타이어 캐릭터에서 착안한 익살스러운 실루엣으로 1960년대 디자인 아이콘이 되었으며, 대량생산 가구의 새로운 가능성을 제시했다. DDL 스튜디오의 첫 협업작으로 출발해 2012년까지 장수 생산되며 현대 팝 디자인의 이정표로 남았다. 공기라는 매개체를 통해 ‘일시적 안정’의 경험과 ‘필연적 쇠퇴’의 서사를 동시에 드러내는 사회적 장치로 기능한다.",
+        },
+        {
+          title: "Tube Chair",
+          year: "1970",
+          company: "Joe Colombo · Flexform → Cappellini",
+          desc: "폴리우레탄 튜브 네 개를 동심원으로 묶은 가변형 구조로, 사용자의 조립에 따라 형태와 착석감이 변화한다. 참여적 퍼포먼스로서 가구의 역할을 재정의한다. 팝아트적 컬러와 자유로운 조합이 특징이며, 구조적 연속성 개념을 구현한 혁신적 디자인으로 평가받는다. 원형 Flexform 버전을 거쳐 2016년 Cappellini가 복각하며 팝아트 가구의 상징으로 부활시켰다. 튜브 의자는 제작 과정 자체를 드러내고, 소비자와 디자이너의 경계를 흐리는 개방적 예술 실험이기도 하다.",
+        },
+        {
+          title: "S Chair",
+          year: "1987",
+          company: "Tom Dixon · limited edition → Cappellini",
+          desc: "S자형 금속 프레임에 골풀을 엮어 인체와 유기적 곡선을 드러낸다. 앉을 때마다 미묘한 비틀림이 체중을 분산시키며 ‘자연스러운 편안함’의 신화를 해체한다. 금속과 천연 섬유의 대비가 촉감적 긴장을 만들어내며, 기계적 완벽함과 유기적 불완전성의 공존을 묻는다. 톰 딕슨의 초기 재활용 강철 작품 중 하나로, 1987년 런던 스튜디오에서 한정 생산되었다가 이후 Cappellini를 통해 벨벳·가죽 버전으로 재출시되었다. S 의자는 몸과 표면 사이의 거리를 재정의하며, 착석 행위를 성찰적 경험으로 전환한다.",
+        },
+
+        {
+          title: ".03 Chair",
+          year: "1998",
+          company: "Maarten van Severen · Vitra",
+          desc: "얇은 폴리우레탄 곡면판이 스프링 강철판 위에서 유연하게 변형되며 반동을 생성한다. 사용자와 구조가 상호작용하며 ‘동적 지지’의 경험을 제공한다. 인체의 열과 압력에 반응해 곡면이 구부러졌다가 반동하며, 좌석과 사용자 간 지속적 대화를 이끈다. 마르텐 반 세베렌이 OMA 프로젝트를 통해 입증한 절제된 모듈러 디자인이 1998년 Vitra를 통해 대량 생산 모델로 탄생했다. .03 의자는 지지와 저항의 균형을 통해 착석자의 인지적 각성을 유발하는 장치로 작동한다.",
+        },
+        {
+          title: "NXT Chair",
+          year: "1986",
+          company: "Peter Karpf · iForm",
+          desc: "압축 성형된 너도밤나무·호두나무 라미네이트가 빈 공간을 통해 균형을 불안정하게 만든다. 체중이 가장자리로 쏠릴수록 끊임없는 움직임을 강제한다. 지속 가능성 원칙을 반영해 최소 폐기물을 목표로 설계되었으며, 원목 라미네이트 선택 옵션이 사용자 경험을 확장한다. 초기 VOXIA 시리즈의 첫 모델로, 1986년부터 오늘날까지 다양한 마감으로 제작되며 꾸준히 진화하고 있다. NXT 의자는 ‘재료의 최소화 vs 경험의 극대화’라는 모순적 명제를 구현한 디자인 사유의 결정체다.",
+        },
+        {
+          title: "P110 Lounge Chair",
+          year: "1972",
+          company: "Alberto Rosselli · Saporiti",
+          desc: "모듈식 강철관과 ABS 패널이 접혔다 펼쳐짐에 따라 실루엣과 기계음을 동시 생성한다. 쉼을 약속하지만 역설적으로 움직임을 요구한다. 이동 주택 전시용 설치 작품으로 선보여진 후, 비평가들로부터 ‘예술적 반항의 행위’로 평가받았다. 1972년 뉴욕 현대미술관 전시 이후 1979년까지 연속 생산되었으며, 현재 에디션 모델로 한정 재발매되고 있다. P110은 ‘안락함’이라는 가치의 상대성을 파헤치는 시퀀셜 오브제として 작동한다.",
+        },
+        {
+          title: "Elastic Chair",
+          year: "c. 1808",
+          company: "Samuel Gragg · Shop of Samuel Gragg",
+          desc: "증기로 휜 히코리·물푸레·참나무 목판과 염소 발 모양 다리가 스프링 없이 자연 유연성을 발현시킨다. 앉을 때마다 미묘한 흔들림을 만들어 전통적 우아함에 불안을 심는다. 고전주의 운동을 반영해 미국 수공예 가구의 혁신적 형태를 제시했으며, 분리형 다리가 구조적 새로움을 드러낸다. 1808년 미국 연방 특허를 취득한 후 소량 생산되었으며, 현재 컬렉터들 사이에서 희귀작으로 평가받는다. Elastic Chair는 ‘인공적 스프링’ 없이도 재료 자체의 탄성으로 동적 편안함을 재정의한다.",
+        },
+        {
+          title: "Anemone Chair",
+          year: "2001",
+          company: "Fernando Campana & Humberto Campana · Edra",
+          desc: "플라스틱 튜브를 손으로 엮어 해파리 같은 등판을 만들었다. 앉으면 튜브 사이의 압력 차가 미묘한 불균형을 일으켜 끊임없이 움직이게 한다. 전통 공예 기술과 현대 제조 기법의 충돌을 통해 노동의 흔적을 가시화하며, ‘자연 모방’의 환상을 해체한다. 캄파나 형제의 초기 협업작으로 2001년 한정 수량 출시되었으며, 이후 여러 캄파나 작품의 모티프로 활용되었다. Anemone은 형태의 이질적 조합으로 ‘유기적 불안정성’을 시각적으로 물화하는 실험적 오브제로 기능한다.",
+        },
+        {
+          title: "Slow Chair",
+          year: "2008",
+          company: "Erwan Bouroullec & Ronan Bouroullec · Vitra",
+          desc: "알루미늄 프레임과 편물 슬링이 직조되어 시각적 가벼움과 동시에 변칙적 저항을 제공한다. 늘어졌다 팽팽해졌다 하는 그물망이 ‘느림의 미학’을 체감하게 만든다. 산업 시스템 속 인간 속도의 재조명을 위해 제작된 이 의자는, 거친 산업소재와 부드러운 섬유의 대비가 극적인 긴장을 자아낸다. 부홀렉 형제의 지속적 Vitra 협업 프로젝트 중 하나로, 다섯 가지 색상 조합을 통해 다양한 환경에 적용 가능하다. 느림의 리추얼을 재발견하게 하는 Slow Chair는 ‘시간과 몸’의 관계를 사유하게 하는 조형적 장치이다.",
+        },
+        {
+          title: "Striped Chair",
+          year: "2005",
+          company:
+            "길이와 장력이 다른 줄들이 결합되어 앉을 때마다 패턴의 반복 속에서 불규칙한 촉감을 생성한다. 파편화된 연대와 분열의 상징이다. 간소화된 플라스틱 부품 두 가지만으로 구조를 완성해 대량생산 효율을 극대화했다. Magis 최초의 부홀렉 협업 작품으로, 이후 안락의자·스툴·벤치까지 확대된 제품군의 기폭제가 되었다. Striped Chair는 ‘단순 구조 vs 복합 감각’을 통해 가구가 사회적 메타포로 확장될 수 있음을 증명한다.",
+        },
+        {
+          title: "Tric Chair",
+          year: "1965",
+          company:
+            "Achille Castiglioni & Pier Giacomo Castiglioni · Bernini → BBB Bonacina",
+          desc: "토넷 No.8751 접이식 의자를 최소 개입으로 재해석해 힌지의 삐걱거림을 남겼다. 과거와 현재의 간극을 극대화하는 디자인 실험이다. 접었다 폈다 할 때마다 들리는 소음이 재설계의 불완전함을 강조하며, 기능성과 조형성의 경계를 무너뜨린다. Bernini 최초 제작 후 BBB Bonacina가 권리를 이어받아 2017년까지 컬렉터의 사랑을 받았다. Tric Chair은 ‘재설계 vs 재발명’ 간의 미묘한 선을 질문하면서 디자인 윤리를 환기한다.",
+        },
+        {
+          title: "Banquete Chair",
+          year: "2002",
+          company: "Fernando Campana & Humberto Campana · limited edition",
+          desc: "동물 봉제 인형을 조밀하게 채워 넣은 좌판이 시각적 즐거움 뒤에 폭압감을 감추고 있다. 과잉 소비의 찌꺼기를 사치로 전환하며 불편함을 조형에 녹여낸다. 각 의자는 25개의 오브제를 수작업으로 배치해 한정판으로 제작되었다. 브라질 폐기물 재활용 미학을 집약한 이 시리즈는, 전 세계 전시에서 회자되며 과잉 소비 비판의 상징이 되었다. Banquete는 ‘소비의 기억’을 입체적 오브제로 압축한 순환 미학의 결정체다.",
+        },
+        {
+          title: "Miss Blanche Chair",
+          year: "1988",
+          company: "Shiro Kuramata · Ishimaru",
+          desc: "투명 아크릴 속 붉은 인조 장미가 떠 있는 조형은 여성적 우아함과 차가운 물질성 사이의 긴장을 드러낸다. 곡선형 팔걸이가 손목을 비틀어 미묘한 압박을 가한다. 포스트모더니즘적 개념 결합으로 기능을 넘어선 서사적 가치를 지닌다. 제작 마지막 단계마다 공장에 직접 감리를 요청할 정도로 쿠라마타의 정교함이 반영된 작품이다. Miss Blanche는 ‘환상 vs 현실’의 거울처럼 작동하며, 아름다움의 이면을 폭로하는 투명한 연극이다.",
+        },
+        {
+          title: "Ribbon Chair CL9",
+          year: "1961",
+          company: "Cesare Leonardi & Franca Stagi · Bernini → Elko",
+          desc: "유리섬유 리본이 이어진 조각적 곡면이 앉을 때 매 순간 다른 탄성 반발을 선사한다. 구조적 연속성과 변형 가능성을 동시에 제시한다. 각 구조는 크롬 도금 강철관과 고무 완충 장치가 결합되어 유연성과 안정성을 조화시킨다. 1969년 이후 Elko가 권리를 이어받아 꾸준히 복각되며 1960년대 낙관주의 디자인의 정수를 전한다. Ribbon Chair는 ‘형태의 연속성 vs 순간의 경험’이 맞부딪히는 현장으로 초대한다.",
+        },
+        {
+          title: "Chair_One",
+          year: "2003",
+          company: "Konstantin Grcic · Magis",
+          desc: "세계 최초 주물 알루미늄 프레임을 적용하여 컴퓨터 설계의 정밀함과 날카로운 모서리가 특징이다. 인체공학적 연구를 기반으로 가공된 형태가 공상과학적 인상을 준다. 제작 과정에서 빅토리아 시대 주철 의자와 비교되며, 디지털 생산 방식이 전통 가구 공정을 어떻게 혁신하는지 보여준다. Magis 상용화 후 빠르게 세계 컬렉션에 편입되어 현대 디자인의 아이콘이 되었다. Chair_One은 ‘디지털 생성 vs 수작업 경험’의 교차로에서 미래를 스케치하는 프로토타입이다.",
+        },
+        {
+          title: "Spine Chair",
+          year: "1980",
+          company: "André Dubreuil · Ceccomi Collezioni",
+          desc: "강철 곡면이 척추 마디를 모방해 체중 집중 지점을 압박한다. 미니멀리즘과 바로크가 만나 형태를 우선시하는 조형성을 강조한다. 두브라이의 미술사 지식을 바탕으로 수작업 용접된 이 작품은, 가구를 넘어 고도의 조각 작품으로 평가받는다. 1988년부터 복수의 전시를 통해 소개되며, 현대 미술과 디자인 경계에서 주목받고 있다. Spine Chair는 ‘신체 모방 vs 형태 혁신’의 경계를 가로지르는 조형적 질문을 제기한다.",
+        },
+        {
+          title: "Primate Kneeling Chair",
+          year: "1970",
+          company: "Achille Castiglioni · Zanotta",
+          desc: "무릎 받침대와 경사진 좌판이 골반과 무릎 사이 불편함을 유발해, 고통을 통해 태도와 성찰의 경험을 이끈다. 일상 자세의 전복을 실험한다. AP 산업디자인협회 창립 멤버의 철학적 탐구 결과물로, 1970년 Zanotta를 통해 첫 선보였다. 이후 다양한 케어체어 디자인에 영향을 미치며, 작업치료 분야에서도 응용된다. Primate Kneeling Chair는 ‘편안함의 탈구체화’를 통해 앉는 행위를 재정의하는 파격적 실험이다.",
+        },
+        {
+          title: "Bone Chair",
+          year: "2006",
+          company: "Joris Laarman · limited edition",
+          desc: "진화 알고리즘으로 생성된 알루미늄 골격이 미세 돌기를 형성해 피부를 동시에 압박한다. 기술적 이상향이 인체에 반드시 편안함을 보장하지 않음을 폭로한다. 제너럴 모터스 산하 아담 오펠의 소프트웨어 실험과 협업해 탄생했으며, 공학과 디자인의 교차점에 위치한다. 한정판으로 제작된 후 주요 디자인 컬렉션에 영구 소장되며, 알고리즘 디자인의 선구자로 인정받았다. Bone Chair는 ‘진화적 최적화 vs 인간 경험’의 모순을 시각적으로 경험하게 한다.",
+        },
+      ];
+      // ③ 화면 전환 함수
+      function showScreen(n) {
+        document.getElementById("screen1").classList.toggle("hidden", n !== 1);
+        document.getElementById("screen2").classList.toggle("hidden", n !== 2);
+      }
+
+      // ④ 상세보기 함수
+      function showDetail(idx) {
+        const info = data[idx];
+        const imgSrc = $items[idx].querySelector("img").src;
+        document.getElementById("detail-image").src = imgSrc;
+        document.getElementById("detail-title").textContent = info.title;
+        document.getElementById("detail-year").textContent = info.year;
+        document.getElementById("detail-company").textContent = info.company;
+        document.getElementById("detail-desc").textContent = info.desc;
+        showScreen(2); // 화면 전환
+      }
+
+      function getZ(arr, i) {
+        return arr.map((_, j) =>
+          j === i ? arr.length : arr.length - Math.abs(i - j)
+        );
+      }
+
+      function display(it, i, act) {
+        const z = getZ([...$items], act)[i];
+        it.style.setProperty("--zIndex", z);
+        it.style.setProperty("--active", (i - act) / $items.length);
+        // 필터 적용: 중앙만 선명하게, 나머지는 뿌옇게
+        it.style.filter = i === act ? "none" : "blur(4px) brightness(0.7)";
+      }
+
+      function animate() {
+        progress = Math.max(0, Math.min(progress, 100));
+        active = Math.floor((progress / 100) * ($items.length - 1));
+        $items.forEach((it, i) => display(it, i, active));
+
+        // ★ Learn More 버튼 표시 로직 추가
+        const learnMoreBtn = document.getElementById("learn-more-container");
+        const screen1Visible = !document
+          .getElementById("screen1")
+          .classList.contains("hidden");
+
+        if (screen1Visible && active === 19) {
+          learnMoreBtn.classList.remove("hidden");
+        } else {
+          learnMoreBtn.classList.add("hidden");
+        }
+      }
+
+      (function loop() {
+        animate();
+        requestAnimationFrame(loop);
+      })();
+
+      $items.forEach((it, i) => {
+        it.addEventListener("click", () => {
+          if (i === active) {
+            showDetail(i);
+          } else {
+            progress = (i / $items.length) * 100 + 10;
+          }
+        });
+      });
+
+      document.addEventListener(
+        "wheel",
+        (e) => (progress += e.deltaY * speedWheel),
+        { passive: true }
+      );
+      document.addEventListener("mousedown", (e) => {
+        isDown = true;
+        startX = e.clientX;
+      });
+      document.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        progress += (e.clientX - startX) * speedDrag;
+        startX = e.clientX;
+      });
+      document.addEventListener("mouseup", (_) => (isDown = false));
+      document.addEventListener(
+        "touchstart",
+        (e) => {
+          isDown = true;
+          startX = e.touches[0].clientX;
+        },
+        { passive: true }
+      );
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!isDown) return;
+          progress += (e.touches[0].clientX - startX) * speedDrag;
+          startX = e.touches[0].clientX;
+        },
+        { passive: true }
+      );
+      document.addEventListener("touchend", (_) => (isDown = false));
+    </script>
+    <script>
+      const text =
+        '"Uncomfortable Chairs 전시는 기능보다 철학과 태도를 우선시한다.    이곳에서 의자는 형태의 긴장감을 통해 세상의 변화를 보여주는 수단이다.       각 의자에는 디자이너가 바라본 미학이 담겨 있으며, 화면 안에서 불편함이    하나의 개성으로 표현된다.의자는 더 이상 앉는 도구가 아니라 우리를 사유하게 만드는 조형적 도발이다.디자이너의 철학이 우선시되는 의자는 ‘우리는 왜     불편함을 선택하는가?’라는 질문을 남긴다.';
+      let idx = 0;
+      let typedDone = false;
+
+      function typeWriter() {
+        if (idx < text.length) {
+          document.getElementById("typed-text").textContent += text.charAt(idx);
+          idx++;
+          setTimeout(typeWriter, 50);
+        } else {
+          typedDone = true;
+          document.getElementById("typed-text").classList.add("cursor");
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        typeWriter();
+
+        document.getElementById("screen0").addEventListener("click", () => {
+          document.getElementById("screen0").classList.add("hidden");
+          document.getElementById("screen1").classList.remove("hidden");
+        });
+      });
+    </script>
+  </body>
+</html>

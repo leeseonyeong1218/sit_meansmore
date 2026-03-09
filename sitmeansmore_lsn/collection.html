@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallery with Lightbox</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        font-family: sans-serif;
+      }
+
+      .banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 60px;
+        height: 72px;
+        background: #000;
+        position: relative;
+        z-index: 10;
+      }
+
+      .banner img {
+        height: 100%;
+        width: auto;
+        filter: brightness(0) invert(1);
+      }
+
+      .logo-collection,
+      .logo-left {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 5px;
+        margin-left: 40px;
+      }
+
+      .logo-site,
+      .logo-center {
+        transform: scale(1.4);
+        height: 15px;
+        margin-top: 5px;
+        margin-left: 175px;
+      }
+
+      .nav-right {
+        display: flex;
+        gap: 75px;
+      }
+
+      .nav-item {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 25px;
+      }
+
+      .nav-item.ch3 {
+        transform: scale(0.31);
+        height: 38px;
+        margin-top: 13px;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 30px;
+        padding: 40px 300px;
+        margin-top: 20px;
+      }
+
+      .image-placeholder {
+        opacity: 0;
+        transform: translateY(-100px);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        overflow: hidden;
+        display: block;
+        animation: fadeSlideIn 0.8s ease-out forwards;
+      }
+
+      @keyframes fadeSlideIn {
+        0% {
+          opacity: 0;
+          transform: translateY(-100px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .image-placeholder img {
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      .image-placeholder.show img {
+        opacity: 1;
+      }
+
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transform: scale(0.95);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        pointer-events: none;
+      }
+
+      .lightbox.show {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+
+      .lightbox-inner {
+        width: 90%;
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .lightbox-inner img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 10px;
+      }
+      button.learn-more {
+        position: relative;
+        display: inline-block;
+        width: 12rem;
+        height: auto;
+        cursor: pointer;
+        outline: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        font-size: inherit;
+        font-family: inherit;
+      }
+
+      button.learn-more .circle {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: relative;
+        display: block;
+        margin: 0;
+        width: 3rem;
+        height: 3rem;
+        background: #4b4b4b;
+        border-radius: 1.625rem;
+      }
+
+      button.learn-more .circle .icon {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: #fff;
+      }
+
+      button.learn-more .circle .icon.arrow {
+        left: 0.625rem;
+        width: 1.125rem;
+        height: 0.125rem;
+        background: none;
+      }
+
+      button.learn-more .circle .icon.arrow::before {
+        content: "";
+        position: absolute;
+        top: -0.25rem;
+        right: 0.0625rem;
+        width: 0.625rem;
+        height: 0.625rem;
+        border-top: 0.125rem solid #fff;
+        border-right: 0.125rem solid #fff;
+        transform: rotate(45deg);
+      }
+
+      button.learn-more .button-text {
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        top: 1.1rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0 0 0 1.85rem;
+        color: #ffffff;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      button.learn-more:hover .circle {
+        width: 100%;
+      }
+
+      button.learn-more:hover .circle .icon.arrow {
+        transform: translate(1rem, 0);
+        background: #fff;
+      }
+
+      button.learn-more:hover .button-text {
+        color: #fff;
+      }
+
+      /* 모달 스타일 */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(3px);
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.96);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      .modal.show {
+        display: flex;
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .modal-content {
+        height: 500px; /* 필요 시 조정 가능 */
+        overflow-y: auto; /* 내용 많아지면 스크롤 */
+        position: relative;
+        background-color: #000;
+        color: #b4b4b4;
+        padding: 40px;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 600px;
+        font-family: "Source Code Pro", monospace;
+        font-size: 14pt;
+        line-height: 2;
+        text-align: left;
+      }
+
+      .modal-content h2 {
+        font-family: "Bodoni Moda", serif;
+        font-size: 3.5rem;
+        margin: 0 0 30px 0;
+        color: #fff;
+        margin-top: 0;
+        margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        background: #000; /* 배경색 있어야 가독성 유지 */
+        z-index: 1;
+        padding-top: 20px; /* 보기 좋게 */
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        font-size: 24px;
+        color: #aaa;
+        cursor: pointer;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* 이제 여기에 제대로 위치 */
+      .exit-button {
+        position: absolute;
+        bottom: 20px;
+        right: 30px;
+        font-size: 1rem;
+        color: #aaa;
+        text-decoration: none;
+        font-family: "Source Code Pro", monospace;
+        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px; /* 화살표와 텍스트 간격 */
+      }
+
+      .exit-button:hover {
+        color: #fff;
+      }
+
+      .exit-button:visited {
+        color: #aaa;
+      }
+
+      .exit-button:visited:hover {
+        color: #fff;
+      }
+
+      .exit-button .arrow {
+        font-size: 1.8rem;
+        font-weight: 300;
+        display: inline-block;
+        transform: translateY(-1px); /* 텍스트랑 정렬 맞추기 */
+      }
+      .intro-text {
+        position: absolute;
+        top: 80px;
+        left: 60px;
+        right: 60px;
+        color: white;
+        font-family: "Source Code Pro", monospace;
+        font-size: 14pt;
+        line-height: 2;
+        white-space: pre-wrap;
+        z-index: 5;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <a href="collection.html" class="logo-collection">
+        <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+      </a>
+      <a href="index.html" class="logo-site">
+        <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+      </a>
+      <div class="nav-right">
+        <a href="ch1.html" class="nav-item">
+          <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+        </a>
+        <a href="ch2.html" class="nav-item">
+          <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+        </a>
+        <a href="ch3.html" class="nav-item ch3">
+          <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+        </a>
+      </div>
+    </header>
+    <div class="banner-underline"></div>
+
+    <div class="gallery" id="gallery"></div>
+
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-inner">
+        <img src="" alt="Expanded Image" id="lightbox-img" />
+      </div>
+    </div>
+    <!-- 버튼 -->
+    <div style="text-align: center; padding: 80px 0">
+      <button class="learn-more" onclick="openModal()">
+        <span class="circle" aria-hidden="true">
+          <span class="icon arrow"></span>
+        </span>
+        <span class="button-text">EXIT</span>
+      </button>
+    </div>
+    <div class="intro-text" id="intro-typing-text"></div>
+
+    <!-- 모달 -->
+    <div id="statement-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>Sit Means More</h2>
+        <p></p>
+        <a href="index.html" class="exit-button">Exit the Exhibition →</a>
+      </div>
+    </div>
+
+    <script>
+      const imageUrls = [
+        "https://i.imgur.com/In9ijSM.jpeg",
+        "https://i.imgur.com/jrJmM0W.jpeg",
+        "https://i.imgur.com/LhhLwfJ.jpeg",
+        "https://i.imgur.com/3vq8s93.jpeg",
+        "https://i.imgur.com/bjbkW63.jpeg",
+        "https://i.imgur.com/ebHOjnn.jpeg",
+        "https://i.imgur.com/FsQagil.jpeg",
+        "https://i.imgur.com/unBucqW.jpeg",
+        "https://i.imgur.com/m0R6S5R.jpeg",
+        "https://i.imgur.com/3fgx557.jpeg",
+        "https://i.imgur.com/Ho0563D.jpeg",
+        "https://i.imgur.com/abM4ygO.jpeg",
+        "https://i.imgur.com/ox3LZ3U.jpeg",
+        "https://i.imgur.com/2Ru3OA2.jpeg",
+        "https://i.imgur.com/pcSSmt8.jpeg",
+        "https://i.imgur.com/0kdGBI9.jpeg",
+        "https://i.imgur.com/JyLIx2h.jpeg",
+        "https://i.imgur.com/jogbe47.jpeg",
+        "https://i.imgur.com/eTIamw5.jpeg",
+        "https://i.imgur.com/HFfizH8.jpeg",
+        "https://i.imgur.com/BdE54ho.jpeg",
+        "https://i.imgur.com/2c4w4dJ.jpeg",
+        "https://i.imgur.com/iVuJ5xy.jpeg",
+        "https://i.imgur.com/DpDBmI8.jpeg",
+        "https://i.imgur.com/nx72MYC.jpeg",
+        "https://i.imgur.com/4EJFP0d.jpeg",
+        "https://i.imgur.com/Be0XHE5.jpeg",
+        "https://i.imgur.com/bx2lJTF.jpeg",
+        "https://i.imgur.com/EcBL2nK.jpeg",
+        "https://i.imgur.com/s6uhRc7.jpeg",
+        "https://i.imgur.com/3mPBNDM.jpeg",
+        "https://i.imgur.com/mxqQHKL.jpeg",
+        "https://i.imgur.com/GBQI7NI.jpeg",
+        "https://i.imgur.com/wBPEPtC.jpeg",
+        "https://i.imgur.com/jEKzKQC.jpeg",
+        "https://i.imgur.com/LZefED0.jpeg",
+        "https://i.imgur.com/W4WY9UC.jpeg",
+        "https://i.imgur.com/BZcZqED.jpeg",
+        "https://i.imgur.com/YLnnGlM.jpeg",
+        "https://i.imgur.com/bOmPDrE.jpeg",
+        "https://i.imgur.com/Ua8Zl8p.jpeg",
+        "https://i.imgur.com/JU43Y7L.jpeg",
+        "https://i.imgur.com/LoYj5MY.jpeg",
+        "https://i.imgur.com/01uaWmv.jpeg",
+        "https://i.imgur.com/47gvgJt.jpeg",
+        "https://i.imgur.com/IvozdQs.jpeg",
+        "https://i.imgur.com/LK5URQK.jpeg",
+        "https://i.imgur.com/wighYgG.jpeg",
+        "https://i.imgur.com/h1TrzZU.jpeg",
+        "https://i.imgur.com/UEyf9eD.jpeg",
+        "https://i.imgur.com/NfbMERO.jpeg",
+        "https://i.imgur.com/B0KMacd.jpeg",
+        "https://i.imgur.com/mIOQtVZ.jpeg",
+        "https://i.imgur.com/G20TqwY.jpeg",
+        "https://i.imgur.com/BMrj6Uy.jpeg",
+        "https://i.imgur.com/JL1i95r.jpeg",
+        "https://i.imgur.com/f9EukD2.jpeg",
+        "https://i.imgur.com/J0dEKz9.jpeg",
+        "https://i.imgur.com/SHxU5BR.jpeg",
+        "https://i.imgur.com/IRzf5aU.jpeg",
+      ];
+
+      const gallery = document.getElementById("gallery");
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+
+      imageUrls.forEach((url, index) => {
+        const placeholder = document.createElement("div");
+        placeholder.className = "image-placeholder";
+        placeholder.style.animationDelay = `${index * 100}ms`;
+
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Gallery Image";
+        img.loading = "lazy";
+
+        img.addEventListener("click", () => {
+          lightbox.classList.add("show");
+          lightboxImg.src = url;
+        });
+
+        placeholder.appendChild(img);
+        setTimeout(() => {
+          placeholder.classList.add("show");
+        }, index * 100);
+
+        gallery.appendChild(placeholder);
+      });
+
+      lightbox.addEventListener("click", () => {
+        lightbox.classList.remove("show");
+        setTimeout(() => {
+          lightboxImg.src = "";
+        }, 300);
+      });
+
+      function openModal() {
+        const modal = document.getElementById("statement-modal");
+        const modalText = modal.querySelector("p");
+        modalText.innerHTML = ""; // 내용 비우기
+        screen1Idx = 0; // 인덱스 초기화
+        modal.style.display = "flex";
+        requestAnimationFrame(() => {
+          modal.classList.add("show");
+          typeWriterScreen1(); // 타이핑 시작
+        });
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("statement-modal");
+        modal.classList.remove("show");
+        setTimeout(() => {
+          modal.style.display = "none";
+        }, 400);
+      }
+
+      // 타이핑 효과 코드
+      const screen1Text =
+        "3개의 챕터를 통해 ‘의자’라는 오브제의 권력과 질서, 미학과 불편함,\n정체성과 감각을 마주하게 된다. \n이 전시는 익숙한 사물을 낯설게 바라보는 시선에서 출발해, 디자인이 사회를 읽고 말하는 방식으로 이어진다.\n의자는 그 자체로 하나의 언어이며, 태도이며, 시대의 단면이다.\n‘앉는다’는 동작너머, 남겨진 의미들이 사유를 이끈다.";
+
+      let screen1Idx = 0;
+
+      function typeWriterScreen1() {
+        const char = screen1Text.charAt(screen1Idx);
+        const container = document.querySelector("#statement-modal p");
+        container.innerHTML += char === "\n" ? "<br>" : char;
+        screen1Idx++;
+        if (screen1Idx < screen1Text.length) {
+          setTimeout(typeWriterScreen1, 120);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        typeWriterScreen1();
+      });
+    </script>
+  </body>
+</html>

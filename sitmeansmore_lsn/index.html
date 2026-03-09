@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>시각디자인워크숍_SitMeansMore</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;600;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .bodoni-moda {
+        font-family: "Bodoni Moda", serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: sans-serif;
+        background: #000;
+      }
+      img {
+        display: block;
+      }
+
+      .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 2.5s ease;
+      }
+
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #screen1 {
+        background: #000000;
+        z-index: 2;
+      }
+
+      .banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 60px;
+        height: 52px;
+        background: #000000;
+        position: relative;
+        z-index: 10;
+      }
+
+      .banner img {
+        height: 100%;
+        width: auto;
+        filter: invert(1) brightness(2);
+      }
+
+      .logo-collection,
+      .logo-left {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 30px;
+        margin-left: 40px;
+      }
+      .logo-site,
+      .logo-center {
+        transform: scale(1.4);
+        height: 15px;
+        margin-top: 25px;
+        margin-left: 175px;
+      }
+      .nav-right {
+        display: flex;
+        gap: 75px;
+      }
+      .nav-item {
+        transform: scale(0.8);
+        height: 15px;
+        margin-top: 45px;
+      }
+      .nav-item.ch3 {
+        transform: scale(0.31);
+        height: 38px;
+        margin-top: 33px;
+      }
+
+      .hero {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 50px);
+        overflow: hidden;
+        z-index: 0;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 50%;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0)
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .hero-bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        margin-top: 10px;
+      }
+
+      .hero-title,
+      .hero-subtitle {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+        opacity: 0;
+        animation-fill-mode: forwards;
+      }
+
+      .hero-title {
+        top: 350px;
+        height: 270px;
+        animation: riseUp 3s ease-out 0.3s forwards;
+      }
+
+      .hero-subtitle {
+        top: 600px;
+        height: 20px;
+        animation: riseUp 3s ease-out 3s forwards;
+      }
+
+      @keyframes riseUp {
+        from {
+          transform: translate(-50%, 40px) scale(1);
+          opacity: 0;
+        }
+        to {
+          transform: translate(-50%, 0) scale(1.15);
+          opacity: 1;
+        }
+      }
+
+      #screen2 {
+        background: #000;
+        z-index: 1;
+        opacity: 0;
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        transition: filter 0.5s ease;
+      }
+      #screen2 .banner {
+        background: none;
+      }
+
+      .hero2 {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        background: url("https://i.imgur.com/I6oGw2l.jpeg") no-repeat center
+          center;
+        background-size: cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 50px;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+      .hero2::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 50%; /* 원하는 비율 조절 가능 */
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.7),
+          rgba(0, 0, 0, 0)
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .hero2 img {
+        max-width: 69%;
+        height: auto;
+        margin-top: -150px;
+        opacity: 0;
+        transform: translateY(100px);
+      }
+
+      .hero2 img.subtitle {
+        max-width: 50%;
+        margin-top: 30px;
+      }
+
+      .animate-rise {
+        animation: riseFromBottom 2s ease-out forwards;
+      }
+
+      @keyframes riseFromBottom {
+        from {
+          transform: translateY(100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .click-guide {
+        position: absolute;
+        top: 660px;
+        width: 100%;
+        text-align: center;
+        font-size: 10pt;
+        color: #bebebecc;
+        opacity: 0;
+        animation: riseFromBottom 2s ease-out forwards;
+        animation-delay: 7s;
+      }
+
+      .vertical-line {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 2000px;
+        background: linear-gradient(
+          to bottom,
+          rgb(179, 179, 179) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+        transition: opacity 4s ease;
+      }
+
+      .vertical-line-white {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 1500px;
+        background: #2b2a2a; /* 회색 단색 */
+        opacity: 0;
+        transition: opacity 2s ease;
+        pointer-events: none;
+        z-index: 3; /* z-index 분리 */
+      }
+    </style>
+    <style>
+      /* 1-1. 기본 커서 숨기기 */
+      body {
+        cursor: none;
+      }
+
+      /* 1-2. 원형 커서 스타일 */
+      .custom-cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+      }
+      .custom-cursor__inner {
+        width: 100%;
+        height: 100%;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        background: transparent;
+        mix-blend-mode: difference;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="custom-cursor"><div class="custom-cursor__inner"></div></div>
+    <div id="screen1" class="screen" onclick="fadeToSecondScreen()">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <img
+          src="https://i.imgur.com/FH3X54Z.jpeg"
+          class="hero-bg"
+          alt="Chair Background"
+        />
+        <img
+          src="https://i.imgur.com/54shp1X.png"
+          class="hero-title"
+          alt="Chair Title"
+        />
+        <img
+          src="https://i.imgur.com/BWtsFlP.png"
+          class="hero-subtitle"
+          alt="Subtitle"
+        />
+        <div class="click-guide">(Click on the screen)</div>
+      </section>
+    </div>
+
+    <div id="screen2" class="screen">
+      <header class="banner">
+        <a href="collection.html" class="logo-collection">
+          <img src="https://i.imgur.com/Ow6iZya.png" alt="COLLECTION" />
+        </a>
+
+        <a href="index.html" class="logo-site">
+          <img src="https://i.imgur.com/qSVTcTu.png" alt="Sitmeansmore" />
+        </a>
+        <div class="nav-right">
+          <a href="ch1.html" class="nav-item">
+            <img src="https://i.imgur.com/YqrL1D9.png" alt="CH1" />
+          </a>
+          <a href="ch2.html" class="nav-item">
+            <img src="https://i.imgur.com/mWiUiHK.png" alt="CH2" />
+          </a>
+          <a href="ch3.html" class="nav-item ch3">
+            <img src="https://i.imgur.com/sNWEaAO.png" alt="CH3" />
+          </a>
+        </div>
+      </header>
+
+      <section class="hero2">
+        <img src="https://i.imgur.com/LtWQ1te.png" alt="Sit Means More Title" />
+        <img
+          src="https://i.imgur.com/3qg6VjK.png"
+          alt="Description"
+          class="subtitle"
+        />
+        <div class="vertical-line"></div>
+      </section>
+      <div class="vertical-line-white"></div>
+    </div>
+
+    <section class="content">
+      <div class="chapters">
+        <!-- CHAPTER 01 -->
+        <div class="chapter">
+          <div class="left">
+            <h3>✱CHAPTER 01</h3>
+            <h2 class="bodoni-moda">Chairs<br />That Speak</h2>
+            <a href="ch1.html" class="button" style="--clr: #fcfcfc">
+              View Exhibition
+              <span class="button__icon-wrapper">
+                <svg
+                  class="button__icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg
+                  class="button__icon-svg button__icon-svg--copy"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </a>
+          </div>
+          <div class="right">
+            <p class="subtitle">
+              의자는 앉기 위한 도구가 아니라, 질문을 남기는 수단
+            </p>
+            <p>의자는 단순한 가구를 넘어, 사회적 메시지를 전달하는 매개체다.</p>
+            <p>
+              이 전시는 권력, 환경, 계층 등의 이슈를 의자를 통해 시각화한다.
+            </p>
+            <p>디자이너가 각 작품에 담은 관점은 사회를 바라보는 언어가 되며,</p>
+            <p>관객은 마치 뉴스를 읽듯 하나의 시대를 다시 마주하게 된다.</p>
+            <p>의자는 조용히, 그러나 분명하게 우리에게 질문을 던진다.</p>
+          </div>
+        </div>
+
+        <!-- CHAPTER 02 -->
+        <div class="chapter">
+          <div class="left">
+            <h3>✱CHAPTER 02</h3>
+            <h2 class="bodoni-moda">Uncomfortable<br />Chairs</h2>
+            <a href="ch2.html" class="button" style="--clr: #fcfcfc">
+              View Exhibition
+              <span class="button__icon-wrapper">
+                <svg
+                  class="button__icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg
+                  class="button__icon-svg button__icon-svg--copy"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </a>
+          </div>
+          <div class="right">
+            <p class="subtitle">불편함도 아름다움이 되는 시대</p>
+            <p>현대의 디자인은 기능보다 철학과 태도를 우선시한다.</p>
+            <p>이 전시는 형태의 긴장감을 통해 소비의 변화를 보여준다.</p>
+            <p>각 의자에는 디자이너가 바라본 미학이 담겨 있고,</p>
+            <p>질서 있는 화면 안에서 불편함이 하나의 개성으로 표현된다.</p>
+            <p>
+              의자는 더 이상 앉는 도구가 아니라, 디자이너를 자극하는 조형이
+              된다.
+            </p>
+          </div>
+        </div>
+
+        <!-- CHAPTER 03 -->
+        <div class="chapter">
+          <div class="left">
+            <h3>✱CHAPTER 03</h3>
+            <h2 class="bodoni-moda">Chairs<br />As Identity</h2>
+            <a href="ch3.html" class="button" style="--clr: #fcfcfc">
+              View Exhibition
+              <span class="button__icon-wrapper">
+                <svg
+                  class="button__icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg
+                  class="button__icon-svg button__icon-svg--copy"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M5 19L19 5M19 5H8M19 5V16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </a>
+          </div>
+          <div class="right">
+            <p class="subtitle">의자를 통해 보여지는 정체성</p>
+            <p>디자인은 감정과 취향, 삶의 태도를 담아내는 수단이다.</p>
+            <p>
+              이 전시는 퍼스널 브랜딩 시대에 ‘의자’가 갖는 새로운 역할을
+              조명한다.
+            </p>
+            <p>
+              디자이너가 각 구성요소에 부여한 의미들이 모여 하나의 정체성을
+              표현하며,
+            </p>
+            <p>의자는 곧 나를 표현하는 가장 감각적인 방식으로 완성된다.</p>
+            <p>
+              관객에게는 각각의 의자가 하나의 인격처럼 다가오는 경험을 제공한다.
+            </p>
+          </div>
+        </div>
+
+        <!-- COPYRIGHT -->
+        <div class="footer">© 2025 Sit Means More</div>
+      </div>
+    </section>
+
+    <style>
+      .content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 160px 20px 150px;
+        color: #fff;
+        font-family: "Noto Sans KR", sans-serif;
+        background: #000;
+      }
+      .chapters {
+        display: grid;
+        grid-template-rows:
+          auto /* chapter1 */
+          auto /* chapter2 */
+          auto /* chapter3 */
+          auto /* footer */;
+        row-gap: 100px;
+        position: relative;
+      }
+      /* 가운데 세로 분할선 */
+      .chapters::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 40px;
+        left: 50%;
+        width: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .chapter {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 40px;
+        align-items: start;
+      }
+
+      /* 왼쪽 컬럼 */
+      .left h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 400;
+        color: #ffffff;
+      }
+      .left h2 {
+        margin: 10px 0;
+        font-size: 60px;
+        line-height: 1.1;
+        font-weight: 700;
+        color: ffff;
+      }
+      /* 공통 버튼 스타일 */
+      /* From Uiverse.io by Creatlydev */
+      .button {
+        margin-top: 20px;
+        line-height: 1;
+        text-decoration: none;
+        display: inline-flex;
+        border: 1px solid #ccc; /* 테두리 고유색 */
+        background-color: #000; /* 기본 검정 */
+        color: #ccc; /* 글자 고유색 */
+        border-radius: 10rem;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        padding-left: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .button__icon-wrapper {
+        flex-shrink: 0;
+        width: 25px;
+        height: 25px;
+        position: relative;
+        color: #ccc;
+        background-color: #000000;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .button:hover {
+        background-color: var(--clr); /* hover 시 고유색으로 */
+        color: #000; /* 글자 검정색 */
+        border-color: transparent; /* 테두리 색을 투명으로 바꿔서 사라지게 */
+      }
+
+      .button:hover .button__icon-wrapper {
+        background-color: #ffffff; /* 아이콘 배경 검정 */
+        color: #000000; /* 아이콘 화이트 */
+      }
+
+      .button__icon-svg--copy {
+        position: absolute;
+        transform: translate(-150%, 150%);
+      }
+
+      .button:hover .button__icon-svg:first-child {
+        transition: transform 0.3s ease-in-out;
+        transform: translate(150%, -150%);
+      }
+
+      .button:hover .button__icon-svg--copy {
+        transition: transform 0.3s ease-in-out 0.1s;
+        transform: translate(0);
+      }
+
+      .chapter .left {
+        margin-left: auto;
+        margin-right: 50px;
+        text-align: right;
+      }
+      .chapter .right {
+        margin-top: 140px;
+        padding-left: 60px;
+      }
+      .right .subtitle {
+        margin: 0 0 33px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+      .right p {
+        margin: 0 0 10px;
+        font-size: 14px;
+        line-height: 1.1;
+        color: #a1a1a1;
+      }
+
+      /* 푸터 */
+      .footer {
+        grid-column: 1 / -1;
+        text-align: center;
+        font-size: 12px;
+        color: #555;
+        margin-top: 200px;
+      }
+      .content {
+        position: relative;
+      }
+      .content::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 100vw;
+        transform: translateX(-50%);
+        height: 400px;
+        background: linear-gradient(
+          to top,
+          rgba(146, 138, 130, 0.4) 0%,
+          rgba(146, 138, 130, 0) 100%
+        );
+        pointer-events: none;
+      }
+    </style>
+    <script>
+      let hasAnimated = false;
+
+      function fadeToSecondScreen() {
+        if (hasAnimated) return;
+        hasAnimated = true;
+
+        const s1 = document.getElementById("screen1");
+        const s2 = document.getElementById("screen2");
+        const hero2 = s2.querySelector(".hero2");
+        const subtitleImg = hero2.querySelector("img.subtitle");
+        const line = hero2.querySelector(".vertical-line");
+        const whiteLine = s2.querySelector(".vertical-line-white");
+
+        s1.classList.add("hidden");
+
+        setTimeout(() => {
+          s2.style.zIndex = 3;
+          s2.style.opacity = 1;
+          document.body.style.overflowY = "auto";
+
+          setTimeout(() => {
+            hero2
+              .querySelector("img:not(.subtitle)")
+              .classList.add("animate-rise");
+          }, 300);
+
+          setTimeout(() => {
+            subtitleImg.classList.add("animate-rise");
+
+            setTimeout(() => {
+              const subRect = subtitleImg.getBoundingClientRect();
+              const heroRect = hero2.getBoundingClientRect();
+              const topPos = subRect.bottom - heroRect.top + 30;
+
+              line.style.top = `${topPos}px`;
+              line.style.bottom = "0";
+              line.style.opacity = 1;
+
+              const screen2Top = s2.getBoundingClientRect().top;
+              const heroBottom = hero2.getBoundingClientRect().bottom;
+              const whiteLineTop = heroBottom - screen2Top;
+
+              whiteLine.style.top = `${whiteLineTop}px`;
+              whiteLine.style.opacity = 1;
+            }, 3000);
+          }, 3500);
+        }, 2500);
+      }
+    </script>
+    <script>
+      (function () {
+        const cursor = document.querySelector(".custom-cursor");
+        let mouseX = 0,
+          mouseY = 0,
+          posX = 0,
+          posY = 0;
+        const speed = 0.15;
+
+        document.addEventListener("mousemove", (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        });
+
+        function animate() {
+          posX += (mouseX - posX) * speed;
+          posY += (mouseY - posY) * speed;
+          cursor.style.transform = `translate(${posX}px, ${posY}px) translate(-50%, -50%)`;
+          requestAnimationFrame(animate);
+        }
+        animate();
+      })();
+    </script>
+  </body>
+</html>
